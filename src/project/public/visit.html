@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta data-details="52:AS6[rxSdsMd4RgYXJgeabsRAVBZ:0406139009]" data-policyId="0123456789" />
+    <meta name="description" content="У нас вы можете купить все необходимое для пошива одежды своими руками. Магазин расположен в центре города и работает с 8:00 до 17:00.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Информация об авторе</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --accent-color: #ff9800;
+            --danger-color: #f44336;
+            --dark-color: #1a1a1a;
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --gradient-dark: linear-gradient(135deg, var(--danger-color), var(--dark-color));
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+            --transition-normal: 0.3s ease;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            opacity: 0;
+            transition: all var(--transition-normal);
+        }
+
+        body.loaded {
+            opacity: 1;
+        }
+
+        body.theme-dark {
+            background: var(--gradient-dark);
+        }
+
+        body.theme-dark .header,
+        body.theme-dark .footer {
+            background: var(--gradient-dark);
+        }
+
+        body.theme-dark .profile-card,
+        body.theme-dark .skill-tag,
+        body.theme-dark .experience-item {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: var(--gradient-primary);
+            margin-bottom: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            transition: all var(--transition-normal);
+            position: relative;
+        }
+
+        .nav-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .nav-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px auto;
+            box-shadow: var(--shadow-md);
+            max-width: 900px;
+            transition: all var(--transition-normal);
+
+        }
+
+        .nav-header.collapsed {
+            height: 0;
+            padding: 0;
+            margin: 0 auto;
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .profile-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all var(--transition-normal);
+            margin: 20px 0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-card .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+
+            border: 4px solid var(--accent-color);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            transition: all var(--transition-normal);
+        }
+
+        .profile-card .avatar:hover {
+            transform: scale(1.05);
+            border-color: #fff;
+        }
+
+        .profile-card .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .skills {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .skill-tag {
+            background: linear-gradient(45deg, var(--accent-color), #ff6b6b);
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+            transition: all var(--transition-normal);
+            border: 2px solid transparent;
+        }
+
+        .skill-tag:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+            border-color: white;
+        }
+
+        .experience-list {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .experience-item {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-normal);
+            border: 2px solid transparent;
+        }
+
+        .experience-item:hover {
+            transform: translateX(10px);
+            border-color: var(--accent-color);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .glow-on-hover {
+            width: 130px;
+            height: 50px;
+            border: none;
+            outline: none;
+            color: #fff;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            cursor: pointer;
+            position: relative;
+            z-index: 0;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all var(--transition-normal);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        body.theme-dark .glow-on-hover {
+            background: linear-gradient(45deg, var(--danger-color), var(--dark-color));
+        }
+
+        .glow-on-hover:before {
+            content: '';
+            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            background-size: 400%;
+            z-index: -1;
+            filter: blur(5px);
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            animation: glowing 20s linear infinite;
+            opacity: 0;
+            transition: opacity .3s ease-in-out;
+            border-radius: 12px;
+        }
+
+        .glow-on-hover:hover:before {
+            opacity: 1;
+        }
+
+        .glow-on-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-spin {
+            width: 140px;
+            height: 50px;
+            background: linear-gradient(45deg, var(--accent-color), #ff6b6b);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.3);
+        }
+
+        body.theme-dark .btn-spin {
+            background: linear-gradient(45deg, var(--danger-color), #ff6b6b);
+        }
+
+        .btn-spin:hover {
+            background: linear-gradient(45deg, #ff6b6b, var(--accent-color));
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 0 8px 30px rgba(255, 152, 0, 0.4);
+        }
+
+        body.theme-dark .btn-spin:hover {
+            background: linear-gradient(45deg, #ff6b6b, var(--danger-color));
+        }
+
+        .nav-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            max-width: 900px;
+            margin: 0 auto;
+            justify-content: center;
+        }
+
+        .user-welcome {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .author-name {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 20px 0;
+            color: var(--accent-color);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        body.theme-dark .author-name {
+            color: #ff6b6b;
+        }
+
+        .group-info {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        /* Стили для кнопок в темной теме */
+        body.theme-dark .header__nav-link {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        body.theme-dark .header__nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        body.theme-dark .nav-toggle {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.theme-dark .nav-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        body.theme-dark .skill-tag {
+            background: linear-gradient(45deg, var(--danger-color), #ff6b6b);
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        body.theme-dark .skill-tag:hover {
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+        }
+
+        body.theme-dark .experience-item {
+            background: linear-gradient(45deg, var(--danger-color), var(--dark-color));
+        }
+
+        @keyframes glowing {
+            0% {
+                background-position: 0 0;
+            }
+
+            50% {
+                background-position: 400% 0;
+            }
+
+            100% {
+                background-position: 0 0;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .center-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="header animate-fade-in">
+            <button class="nav-toggle" id="navToggle">☰</button>
+            <div class="center-content">
+                <h2 class="user-welcome">Добро пожаловать, <span id="userName"></span>!</h2>
+                <button id="logoutBtn" class="btn-spin">Выйти</button>
+            </div>
+        </header>
+
+        <div class="nav-header animate-fade-in" id="navHeader">
+            <nav>
+                <div class="nav-grid">
+                    <button id="themeToggle" class="glow-on-hover">Сменить тему</button>
+
+                    <a href="main.html"><button class="glow-on-hover" type="button">Главная</button></a>
+                    <a href="new.html"><button class="glow-on-hover" type="button">Новости</button></a>
+                    <a href="prac.html"><button class="glow-on-hover" type="button">Практика</button></a>
+                    <a href="tov.html"><button class="glow-on-hover" type="button">Товары</button></a>
+                    <a href="youtube.html"><button class="glow-on-hover" type="button">Youtube</button></a>
+                    <a href="contacts.html"><button class="glow-on-hover" type="button">Контакты</button></a>
+                </div>
+            </nav>
+        </div>
+
+        <main>
+            <section class="profile-card animate-fade-in">
+                <h2>Информация об авторе</h2>
+                <div class="avatar">
+                    <img src="./assets/ff.jpg" alt="Фотография авторов">
+                </div>
+                <h3 class="author-name">Элизбарян Артём Гайкович и Чобан Александр Александрович</h3>
+                <p class="group-info">ЭФБО-14-24</p>
+
+                <div class="skills">
+                    <span class="skill-tag">кайфовые</span>
+                    <span class="skill-tag">игрем в клеш</span>
+                    <span class="skill-tag">знем питон</span>
+                    <span class="skill-tag">мастера тиктока</span>
+                </div>
+
+                <div class="experience-list">
+                    <label>Наш опыт:</label>
+                    <div class="experience-item">хз</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA1uvORzkRR61w2lz63TRAd9UUc5Crf_sc",
+            authDomain: "my-login-site-e0037.firebaseapp.com",
+            projectId: "my-login-site-e0037",
+            storageBucket: "my-login-site-e0037.firebasestorage.app",
+            messagingSenderId: "496590227955",
+            appId: "1:496590227955:web:4848677cbd1610743a6a86",
+            measurementId: "G-YW2BD7XZCK"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const userNameSpan = document.getElementById('userName');
+        const logoutBtn = document.getElementById('logoutBtn');
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                userNameSpan.textContent = user.email;
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+        logoutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+            window.location.href = 'index.html';
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Сохранение и загрузка темы
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('theme-dark');
+                themeBtn.textContent = 'Светлая тема';
+            }
+        }
+
+        function saveTheme() {
+            const isDark = document.body.classList.contains('theme-dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        // Управление навигационной панелью
+        const navToggle = document.getElementById('navToggle');
+        const navHeader = document.getElementById('navHeader');
+        let isNavVisible = true;
+
+        function toggleNavigation() {
+            isNavVisible = !isNavVisible;
+            if (isNavVisible) {
+                navHeader.classList.remove('collapsed');
+                navToggle.textContent = '☰';
+            } else {
+                navHeader.classList.add('collapsed');
+                navToggle.textContent = '⊕';
+            }
+        }
+
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
+            loadTheme();
+        });
+
+        const themeBtn = document.getElementById('themeToggle');
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('theme-dark');
+            themeBtn.textContent = document.body.classList.contains('theme-dark')
+                ? 'Светлая тема'
+                : 'Тёмная тема';
+            saveTheme();
+        });
+
+        navToggle.addEventListener('click', toggleNavigation);
+    </script>
+</body>
+
+</html>
