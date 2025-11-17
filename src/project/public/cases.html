@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Кейс CS:GO 🎰</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #1c1c1f;
+      font-family: Arial, sans-serif;
+      color: #eee;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 1s ease;
+}
+
+    body.loaded {
+      opacity: 1;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      background: #2a2a2f;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+    .info {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .slot-view {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      margin: 30px auto;
+      overflow: hidden;
+      background: #111;
+      border: 3px solid #444;
+      border-radius: 10px;
+    }
+    .slot-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+    }
+    .slot-item {
+      width: 160px;
+      height: 180px;
+      margin: 0 10px;
+      background: #222;
+      border: 2px solid #333;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .slot-item img {
+      width: 100%;
+      height: 120px;
+      object-fit: contain;
+      background: #111;
+    }
+    .slot-item .name {
+      font-size: 14px;
+      padding: 2px;
+    }
+    .slot-item .price {
+      font-size: 12px;
+      color: #bbb;
+      padding-bottom: 5px;
+    }
+    .controls {
+      margin-bottom: 20px;
+    }
+    .btn {
+      padding: 12px 30px;
+      margin: 0 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .btn-spin {
+      background: #ff6f00;
+      color: white;
+    }
+    .btn-spin:hover {
+      background: #ff9f1a;
+      transform: scale(1.05);
+    }
+    .btn-balance {
+      background: #009688;
+      color: white;
+    }
+    .btn-balance:hover {
+      background: #26a69a;
+      transform: scale(1.05);
+    }
+    .result {
+      font-size: 24px;
+      margin-top: 15px;
+      height: 30px;
+    }
+    /* Подсветка победного */
+    @keyframes blink {
+      0%,100% { border-color: #ffcc00; box-shadow: 0 0 10px #ffcc00; }
+      50% { border-color: #ffffff; box-shadow: none; }
+    }
+    .win-highlight {
+      animation: blink 1s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Кейс «CS:GO»</h1>
+    <div class="info">
+      Баланс: <span id="balance">100</span> ₽  
+      | Ставка: <span id="bet">50</span> ₽
+    </div>
+
+    <div class="slot-view">
+      <div class="slot-track" id="slotTrack"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-spin" onclick="openCase()">Открыть кейс</button>
+      <button class="btn btn-balance" onclick="addBalance()">Пополнить +500₽</button>
+    </div>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const caseItems = [
+      { name: "AK-47 | Красная линия", price: "1500 ₽", img: "https://media.sketchfab.com/models/0b795dc3ffd94fddb3dc1c981769c98c/thumbnails/ca8085bc61d845709394e24ce9523c62/640x360.jpeg" },
+      { name: "AWP | Азимов", price: "3500 ₽", img: "https://i.ytimg.com/vi/H52pXmt-jRU/maxresdefault.jpg" },
+      { name: "M4A1-S | Неоновой гонщик", price: "2400 ₽", img: "https://i.ytimg.com/vi/6JK6MR2GXsU/hqdefault.jpg" },
+      { name: "USP-S | Убийство подтверждено", price: "1900 ₽", img: "https://i.ytimg.com/vi/aWwlQwQCNuw/maxresdefault.jpg" },
+      { name: "Desert Eagle | Поток информации", price: "1200 ₽", img: "https://cs.money/ru/blog/wp-content/uploads/2025/03/frame-11.png" }
+    ];
+
+    let balance = 100;
+    const bet = 50;
+
+    const slotTrack = document.getElementById("slotTrack");
+    const resultEl = document.getElementById("result");
+    const balanceEl = document.getElementById("balance");
+
+    function openCase() {
+      if (balance < bet) {
+        resultEl.textContent = "Недостаточно средств!";
+        return;
+      }
+      balance -= bet;
+      balanceEl.textContent = balance;
+      resultEl.textContent = "";
+
+      slotTrack.innerHTML = "";
+      // создаём длинный список
+      const longList = [];
+      for (let i = 0; i < 20; i++) {
+        longList.push(caseItems[Math.floor(Math.random() * caseItems.length)]);
+      }
+      const finalItem = caseItems[Math.floor(Math.random() * caseItems.length)];
+      longList.push(finalItem);
+
+      longList.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "slot-item";
+        div.innerHTML = `
+          <img src="${item.img}" alt="${item.name}">
+          <div class="name">${item.name}</div>
+          <div class="price">${item.price}</div>
+        `;
+        slotTrack.appendChild(div);
+      });
+
+      const itemWidth = 180; // ширина карточки + margin
+      const totalMove = itemWidth * (longList.length - 5);
+
+      slotTrack.style.transition = "transform 3s cubic-bezier(0.25,0.46,0.45,0.94)";
+      slotTrack.style.transform = `translateX(-${totalMove}px)`;
+
+      setTimeout(() => {
+        slotTrack.style.transition = "none";
+        slotTrack.style.transform = "translateX(0)";
+
+        resultEl.textContent = `🎉 Вам выпало: ${finalItem.name} (${finalItem.price})`;
+        const items = slotTrack.querySelectorAll(".slot-item");
+        const lastItem = items[items.length - 1];
+        if (lastItem) lastItem.classList.add("win-highlight");
+
+        balance += bet * 2;
+        balanceEl.textContent = balance;
+      }, 3200);
+    }
+
+    function addBalance() {
+      balance += 50;
+      balanceEl.textContent = balance;
+    }
+  </script>
+  <script>
+  window.addEventListener('load', () => {
+    document.body.classList.add('loaded');
+  });
+</script>
+</body>
+</html>
+
