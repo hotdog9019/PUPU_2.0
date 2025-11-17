@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Основная информация профиля">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дневник</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+<style>
+    body {
+        background: linear-gradient(135deg, #4CAF50, #2196F3);
+    }
+</style>
+
+<body>
+    <header class="header">
+        <button class="nav-toggle" id="navToggle">☰</button>
+        <p><a class="student-name">Чобан Александр</a></p>
+        <nav>
+            <ul class="header__nav" id="headerNav">
+                <li><a class="header__nav-link" href="../main.html">Назад</a></li>
+                <li><a class="header__nav-link" href="../chob.html">Главная</a></li>
+                <li><a class="header__nav-link" href="projects.html">Проекты</a></li>
+                <li><a class="header__nav-link" href="diary.html">Дневник</a></li>
+                <li><a class="header__nav-link" href="contacts.html">Контакты</a></li>
+                <li><a class="header__nav-link" href="pa.html">Изображения</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="content">
+        <h1>Мой учебный прогресс</h1>
+        <div id="addForm" class="add-form" style="display: none;">
+            <h3>Добавить новую запись</h3>
+            <div class="form-group">
+                <div class="form-label">Дата:</div>
+                <input type="date" id="recordDate" class="form-input">
+            </div>
+            <div class="form-group">
+                <div class="form-label">Описание:</div>
+                <input type="text" id="recordDescription" class="form-input" placeholder="Что вы изучили?">
+            </div>
+            <div class="form-group">
+                <div class="form-label">Статус:</div>
+                <select id="recordStatus" class="form-input">
+                    <option value="in-progress">В процессе</option>
+                    <option value="completed">Завершено</option>
+                </select>
+            </div>
+            <div class="form-buttons">
+                <button type="button" id="saveButton" class="submit-button">Сохранить</button>
+                <button type="button" id="cancelButton" class="cancel-button">Отмена</button>
+            </div>
+        </div>
+
+        <div class="progress-box" id="progressContainer">
+            <div class="progress-item completed">15 дек - Верстка макета сайта ✓</div>
+            <div class="progress-item completed">10 дек - JavaScript основы ✓</div>
+            <div class="progress-item in-progress">05 дек - Работа с формами ⏳</div>
+            <div class="progress-item in-progress">01 дек - Адаптивная верстка ⏳</div>
+        </div>
+
+        <h2>Текущие курсы</h2>
+
+        <div class="course-progress">
+            <div class="course-item">
+                <span class="course-name">Веб-разработка</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 90%"></div>
+                </div>
+                <span class="progress-percent">90%</span>
+            </div>
+
+            <div class="course-item">
+                <span class="course-name">JavaScript</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 70%"></div>
+                </div>
+                <span class="progress-percent">70%</span>
+            </div>
+
+            <div class="course-item">
+                <span class="course-name">React</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 50%"></div>
+                </div>
+                <span class="progress-percent">50%</span>
+            </div>
+        </div>
+
+        <button class="add-button" id="addButton">Добавить запись</button>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2024 Чобан Александр. Все права защищены.</p>
+    </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const addButton = document.getElementById('addButton');
+            const addForm = document.getElementById('addForm');
+            const saveButton = document.getElementById('saveButton');
+            const cancelButton = document.getElementById('cancelButton');
+            const progressContainer = document.getElementById('progressContainer');
+            addButton.addEventListener('click', function () {
+                addForm.style.display = 'block';
+                addButton.style.display = 'none';
+            });
+            cancelButton.addEventListener('click', function () {
+                addForm.style.display = 'none';
+                addButton.style.display = 'block';
+                clearForm();
+            });
+            saveButton.addEventListener('click', function () {
+                const date = document.getElementById('recordDate').value;
+                const description = document.getElementById('recordDescription').value;
+                const status = document.getElementById('recordStatus').value;
+
+                if (!date || !description) {
+                    alert('Пожалуйста, заполните все поля');
+                    return;
+                }
+                const formattedDate = formatDate(date);
+                const newRecord = document.createElement('div');
+                newRecord.className = `progress-item ${status}`;
+                let statusIcon = '⏳';
+                if (status === 'completed') {
+                    statusIcon = '✓';
+                }
+                newRecord.textContent = `${formattedDate} - ${description} ${statusIcon}`;
+                progressContainer.insertBefore(newRecord, progressContainer.firstChild);
+                addForm.style.display = 'none';
+                addButton.style.display = 'block';
+                clearForm();
+
+                alert('Запись успешно добавлена!');
+            });
+            function clearForm() {
+                document.getElementById('recordDate').value = '';
+                document.getElementById('recordDescription').value = '';
+                document.getElementById('recordStatus').value = 'in-progress';
+            }
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                const day = date.getDate();
+                const month = date.toLocaleString('ru-RU', { month: 'short' });
+                return `${day} ${month}`;
+            }
+        });
+        // Управление навигационной панелью
+        const navToggle = document.getElementById('navToggle');
+        const headerNav = document.getElementById('headerNav');
+        let isNavVisible = true;
+
+        function toggleNavigation() {
+            isNavVisible = !isNavVisible;
+            if (isNavVisible) {
+                headerNav.classList.remove('collapsed');
+                navToggle.textContent = '☰';
+            } else {
+                headerNav.classList.add('collapsed');
+                navToggle.textContent = '⊕';
+            }
+        }
+        navToggle.addEventListener('click', toggleNavigation);
+    </script>
+</body>
+
+</html>

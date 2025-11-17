@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Основная информация профиля">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты</title>
+    <link rel="stylesheet" href="../style/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #4CAF50, #2196F3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .student-name {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #333;
+            padding: 5px 10px;
+        }
+
+        .nav-link.active {
+            font-weight: bold;
+            border-bottom: 2px solid #333;
+        }
+
+        .content {
+            margin: 40px 0;
+        }
+
+        .content h1 {
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .contact-form-box {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 5px;
+            margin-bottom: 40px;
+            border: 1px solid #ddd;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+
+        .message-input {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-button {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .contact-info {
+            margin-bottom: 40px;
+        }
+
+        .contact-info h2 {
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .contact-item {
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+
+        .email-link {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .email-link:hover {
+            text-decoration: underline;
+        }
+
+        .social-links h2 {
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .social-item {
+            margin-bottom: 10px;
+        }
+
+        .social-link {
+            color: #333;
+            text-decoration: none;
+            padding: 5px 0;
+            display: inline-block;
+        }
+
+        .social-link:hover {
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 40px;
+            border-top: 1px solid #ddd;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <button class="nav-toggle" id="navToggle">☰</button>
+        <p><a class="student-name">Чобан Александр</a></p>
+        <nav>
+            <ul class="header__nav" id="headerNav">
+                <li><a class="header__nav-link" href="../main.html">Назад</a></li>
+                <li><a class="header__nav-link" href="../chob.html">Главная</a></li>
+                <li><a class="header__nav-link" href="projects.html">Проекты</a></li>
+                <li><a class="header__nav-link" href="diary.html">Дневник</a></li>
+                <li><a class="header__nav-link" href="contacts.html">Контакты</a></li>
+                <li><a class="header__nav-link" href="pa.html">Изображения</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="content">
+        <h1>Свяжитесь со мной</h1>
+
+        <div class="contact-form-box">
+            <div class="form-group">
+                <div class="form-label">Имя:</div>
+                <input type="text" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <div class="form-label">Email:</div>
+                <input type="email" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <div class="form-label">Сообщение:</div>
+                <textarea class="form-input message-input" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="submit-button">Отправить сообщение</button>
+        </div>
+
+        <div class="contact-info">
+            <h2>Контакты:</h2>
+            <div class="contact-item">
+                📧 <a href="mailto:Xubabuba111@gmail.com" class="email-link">Xubabuba111@gmail.com</a>
+            </div>
+            <div class="contact-item">📍 Москва, ул. Пушкина 22</div>
+        </div>
+
+        <div class="social-links">
+            <h2>Социальные сети:</h2>
+            <div class="social-item">
+                <a href="https://github.com/MarioDD1" class="social-link">GitHub</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2024 Чобан Александр. Все права защищены.</p>
+    </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('.contact-form-box');
+            const submitButton = form.querySelector('.submit-button');
+
+            submitButton.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const inputs = form.querySelectorAll('input[required], textarea[required]');
+                let isValid = true;
+
+                inputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.style.borderColor = '#ff4444';
+                    } else {
+                        input.style.borderColor = '#ddd';
+                    }
+                });
+
+                const emailInput = form.querySelector('input[type="email"]');
+                if (emailInput.value && !isValidEmail(emailInput.value)) {
+                    isValid = false;
+                    emailInput.style.borderColor = '#ff4444';
+                }
+
+                if (isValid) {
+                    alert('Сообщение отправлено!');
+                    form.reset();
+                } else {
+                    alert('Пожалуйста, заполните все поля корректно');
+                }
+            });
+
+            function isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+        });
+        // Управление навигационной панелью
+        const navToggle = document.getElementById('navToggle');
+        const headerNav = document.getElementById('headerNav');
+        let isNavVisible = true;
+
+        function toggleNavigation() {
+            isNavVisible = !isNavVisible;
+            if (isNavVisible) {
+                headerNav.classList.remove('collapsed');
+                navToggle.textContent = '☰';
+            } else {
+                headerNav.classList.add('collapsed');
+                navToggle.textContent = '⊕';
+            }
+        }
+
+        navToggle.addEventListener('click', toggleNavigation);
+    </script>
+</body>
+
+</html>
