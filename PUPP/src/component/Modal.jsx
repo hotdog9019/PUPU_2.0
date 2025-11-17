@@ -1,4 +1,4 @@
-import 'C:/Users/v317admin/Pupu/src2/pupup/src/component/Modal.css';
+import './Modal.css';
 
 // Простой переиспользуемый компонент модального окна
 function Modal({ isOpen, onClose, title, children }) {

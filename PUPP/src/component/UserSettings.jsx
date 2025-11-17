@@ -1,5 +1,5 @@
 // UserSettings.jsx - компонент настроек пользователя
-import useLocalStorage from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/useLocalStorage';
+import useLocalStorage from './useLocalStorage';
 
 function UserSettings() {
   // Используем наш кастомный хук для разных настроек

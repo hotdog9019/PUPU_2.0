@@ -1,5 +1,5 @@
 import React from 'react';
-import 'C:/Users/v317admin/Pupu/src2/pupup/src/component/TechnologyCard.css';
+import './TechnologyCard.css';
 
 // Порядок смены статусов
 const STATUSES = ['not-started', 'in-progress', 'completed'];

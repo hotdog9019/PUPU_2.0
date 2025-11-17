@@ -1,6 +1,6 @@
 // SimpleModalExample.jsx
 import { useState } from 'react';
-import Modal from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/Modal';
+import Modal from './Modal';
 
 function SimpleModalExample() {
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -1,6 +1,6 @@
 // ProgressDashboard.jsx - демонстрация разных вариантов прогресс-бара
-import ProgressBar from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/ProgressBar';
-import 'C:/Users/v317admin/Pupu/src2/pupup/src/component/ProgressDashboard.css'; // Добавим файл со стилями
+import ProgressBar from './ProgressBar';
+import './ProgressDashboard.css'; // Добавим файл со стилями
 
 function ProgressDashboard({
   overallProgress = 0,

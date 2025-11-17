@@ -1,21 +1,27 @@
 // App.js
 import React, { useState, useMemo } from 'react';
-import 'C:/Users/v317admin/Pupu/src2/pupup/src/App.css';
-import Greeting from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/Greeting';
-import UserCard from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/UseCard';
-import TaskList from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/TaskList';
-import TechnologyCard from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/TechologyCard.jsx';
-import ProgressHeader from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/ProgressHeader';
-import UserSettings from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/UserSettings.jsx';
-import SimpleModalExample from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/SimpleModalExample.jsx';
-import ProgressDashboard from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/ProgressDashboard.jsx';
-import WindowSizeTracker from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/WindowSizeTracker';
-import UserProfile from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/UserProfile';
-import ContactForm from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/ContactForm';
-import Counter from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/Counter';
-import RegistrationForm from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/RegistrationForm';
-import ColorPicker from 'C:/Users/v317admin/Pupu/src2/pupup/src/component/ColorPicker';
-
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import './App.css';
+import Home from './pages/Home';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Greeting from '../src/component/Greeting';
+import UserCard from '../src/component/UseCard';
+import TaskList from '../src/component/TaskList';
+import TechnologyCard from '../src/component/TechologyCard.jsx';
+import ProgressHeader from '../src/component/ProgressHeader.jsx';
+import UserSettings from '../src/component/UserSettings.jsx';
+import SimpleModalExample from '../src/component/SimpleModalExample.jsx';
+import ProgressDashboard from '../src/component/ProgressDashboard.jsx';
+import WindowSizeTracker from '../src/component/WindowSizeTracker';
+import UserProfile from '../src/component/UserProfile';
+import ContactForm from '../src/component/ContactForm';
+import Counter from '../src/component/Counter';
+import RegistrationForm from '../src/component/RegistrationForm';
+import ColorPicker from '../src/component/ColorPicker';
+import useTechnologiesApi from '../src/component/hooks/useTechnologiesApi';
+import RoadmapImporter from '../src/component/RoadmapImporter';
+import TechnologyList from '../src/pages/TechnologyList.js';
 const POSSIBLE_STATUSES = ['not-started', 'in-progress', 'completed'];
 
 const statusToProgress = (status) => {
@@ -28,107 +34,174 @@ const statusToProgress = (status) => {
 };
 
 function App() {
-  const [technologies, setTechnologies] = useState([
-    { id: 1, title: 'React Components ', description: 'Изучение базовых компонентов', status: 'completed' },
-    { id: 2, title: 'JSX Syntax ', description: 'Освоение синтаксиса JSX', status: 'in-progress' },
-    { id: 3, title: 'State Management ', description: 'Работа с состоянием компонентов', status: 'not-started' }
-  ]);
+  const { technologies, loading, error, refetch } = useTechnologiesApi();
 
-  const handleStatusChange = (id, newStatus) => {
-    setTechnologies(prev =>
-      prev.map(tech => (tech.id === id ? { ...tech, status: newStatus } : tech))
+  if (loading) {
+    return (
+      <div className="app-loading">
+        <div className="spinner"></div>
+        <p>Загрузка технологий...</p>
+      </div>
     );
-  };
-
-  const randomizeAllStatuses = () => {
-    setTechnologies(prev =>
-      prev.map(tech => {
-        const randomStatus = POSSIBLE_STATUSES[Math.floor(Math.random() * POSSIBLE_STATUSES.length)];
-        return { ...tech, status: randomStatus };
-      })
-    );
-  };
-
-  const progressData = useMemo(() => {
-    const techProgress = technologies.map(tech => ({
-      id: tech.id,
-      title: tech.title,
-      progress: statusToProgress(tech.status)
-    }));
-
-    const overall = Math.round(
-      techProgress.reduce((sum, t) => sum + t.progress, 0) / techProgress.length
-    );
-
-    const frontendProgress = techProgress.find(t => t.id === 1)?.progress || 0;
-    const backendProgress = techProgress.find(t => t.id === 2)?.progress || 0;
-    const databaseProgress = techProgress.find(t => t.id === 3)?.progress || 0;
-
-    return {
-      overall,
-      frontendProgress,
-      backendProgress,
-      databaseProgress
-    };
-  }, [technologies]);
+  }
 
   return (
-    <div className="App">
-      <Greeting />
-      
-      <UserCard
-        name="Артём и Саня"
-        role="Администратор"
-        avatarUrl="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfVMhpKmVy_-iwfRLAiNiaDslMa-2oEz7KTw&s"
-        isOnline={true}
-      />
-
-      <div className="technology-list">
-        {technologies.map(tech => (
-          <TechnologyCard
-            key={tech.id}
-            title={tech.title}
-            description={tech.description}
-            status={tech.status}
-            onStatusChange={(newStatus) => handleStatusChange(tech.id, newStatus)}
-          />
-        ))}
-
-        {}
-        <button
-          onClick={randomizeAllStatuses}
-          style={{
-            margin: '20px 0',
-            padding: '10px 20px',
-            fontSize: '16px',
-            backgroundColor: '#000000ff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer'
-          }}
-        >
-           Случайный прогресс
+    <div className="app">
+      <header className="app-header">
+        <h1>🚀 Трекер изучения технологий</h1>
+        <button onClick={refetch} className="refresh-btn">
+          Обновить
         </button>
+      </header>
 
-        <ProgressDashboard
-          overallProgress={progressData.overall}
-          frontendProgress={progressData.frontendProgress}
-          backendProgress={progressData.backendProgress}
-          databaseProgress={progressData.databaseProgress}
-        />
+      {error && (
+        <div className="app-error">
+          <p>{error}</p>
+          <button onClick={refetch}>Попробовать снова</button>
+        </div>
+      )}
 
-        <Counter />
-        <RegistrationForm />
-        <ColorPicker />
-        <WindowSizeTracker />
-        <UserProfile />
-        <ContactForm />
-        <UserSettings />
-        <SimpleModalExample />
-      </div>
+      <main className="app-main">
+        <RoadmapImporter />
+        <TechnologyList technologies={technologies} />
+      </main>
     </div>
   );
+
+//   return (
+//     <Router>
+//       <div className="app">
+//         {/* Навигационное меню */}
+//         <nav className="main-nav">
+//           <div className="nav-brand">
+//             <h2>Мое Приложение</h2>
+//           </div>
+//           <ul className="nav-links">
+//             <li>
+//               <Link to="/">Главная</Link>
+//             </li>
+//             <li>
+//               <Link to="/about">О нас</Link>
+//             </li>
+//             <li>
+//               <Link to="/contact">Контакты</Link>
+//             </li>
+//           </ul>
+//         </nav>
+
+//         {/* Основное содержимое */}
+//         <main className="main-content">
+//           <Routes>
+//             <Route path="/" element={<Home />} />
+//             <Route path="/about" element={<About />} />
+//             <Route path="/contact" element={<Contact />} />
+//           </Routes>
+//         </main>
+//       </div>
+//     </Router>
+// );
+
+//   const [technologies, setTechnologies] = useState([
+//     { id: 1, title: 'React Components ', description: 'Изучение базовых компонентов', status: 'completed' },
+//     { id: 2, title: 'JSX Syntax ', description: 'Освоение синтаксиса JSX', status: 'in-progress' },
+//     { id: 3, title: 'State Management ', description: 'Работа с состоянием компонентов', status: 'not-started' }
+//   ]);
+
+//   const handleStatusChange = (id, newStatus) => {
+//     setTechnologies(prev =>
+//       prev.map(tech => (tech.id === id ? { ...tech, status: newStatus } : tech))
+//     );
+//   };
+
+//   const randomizeAllStatuses = () => {
+//     setTechnologies(prev =>
+//       prev.map(tech => {
+//         const randomStatus = POSSIBLE_STATUSES[Math.floor(Math.random() * POSSIBLE_STATUSES.length)];
+//         return { ...tech, status: randomStatus };
+//       })
+//     );
+//   };
+
+//   const progressData = useMemo(() => {
+//     const techProgress = technologies.map(tech => ({
+//       id: tech.id,
+//       title: tech.title,
+//       progress: statusToProgress(tech.status)
+//     }));
+
+//     const overall = Math.round(
+//       techProgress.reduce((sum, t) => sum + t.progress, 0) / techProgress.length
+//     );
+
+//     const frontendProgress = techProgress.find(t => t.id === 1)?.progress || 0;
+//     const backendProgress = techProgress.find(t => t.id === 2)?.progress || 0;
+//     const databaseProgress = techProgress.find(t => t.id === 3)?.progress || 0;
+
+//     return {
+//       overall,
+//       frontendProgress,
+//       backendProgress,
+//       databaseProgress
+//     };
+//   }, [technologies]);
+
+//   return (
+//     <div className="App">
+//       <Greeting />
+      
+//       <UserCard
+//         name="Артём и Саня"
+//         role="Администратор"
+//         avatarUrl="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfVMhpKmVy_-iwfRLAiNiaDslMa-2oEz7KTw&s"
+//         isOnline={true}
+//       />
+
+//       <div className="technology-list">
+//         {technologies.map(tech => (
+//           <TechnologyCard
+//             key={tech.id}
+//             title={tech.title}
+//             description={tech.description}
+//             status={tech.status}
+//             onStatusChange={(newStatus) => handleStatusChange(tech.id, newStatus)}
+//           />
+//         ))}
+
+//         {}
+//         <button
+//           onClick={randomizeAllStatuses}
+//           style={{
+//             margin: '20px 0',
+//             padding: '10px 20px',
+//             fontSize: '16px',
+//             backgroundColor: '#000000ff',
+//             color: 'white',
+//             border: 'none',
+//             borderRadius: '8px',
+//             cursor: 'pointer'
+//           }}
+//         >
+//            Случайный прогресс
+//         </button>
+
+//         <ProgressDashboard
+//           overallProgress={progressData.overall}
+//           frontendProgress={progressData.frontendProgress}
+//           backendProgress={progressData.backendProgress}
+//           databaseProgress={progressData.databaseProgress}
+//         />
+
+//         <Counter />
+//         <RegistrationForm />
+//         <ColorPicker />
+//         <WindowSizeTracker />
+//         <UserProfile />
+//         <ContactForm />
+//         <UserSettings />
+//         <SimpleModalExample />
+//       </div>
+//     </div>
+//   );
 }
 
 export default App;
