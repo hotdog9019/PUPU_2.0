@@ -34,174 +34,214 @@ const statusToProgress = (status) => {
 };
 
 function App() {
-  const { technologies, loading, error, refetch } = useTechnologiesApi();
+  const { technologies: apiTechnologies, loading, error, refetch, addTechnology } = useTechnologiesApi();
+
+  const [localTechnologies, setLocalTechnologies] = useState([
+    { id: 1, title: 'React Components ', description: 'Изучение базовых компонентов', status: 'completed' },
+    { id: 2, title: 'JSX Syntax ', description: 'Освоение синтаксиса JSX', status: 'in-progress' },
+    { id: 3, title: 'State Management ', description: 'Работа с состоянием компонентов', status: 'not-started' }
+  ]);
+
+  // Объединяем локальные технологии и технологии из API
+  const allTechnologies = useMemo(() => {
+    // Преобразуем API технологии в формат для отображения
+    const apiTechWithStatus = apiTechnologies.map(tech => ({
+      ...tech,
+      status: 'not-started' // По умолчанию для импортированных технологий
+    }));
+    
+    return [...localTechnologies, ...apiTechWithStatus];
+  }, [localTechnologies, apiTechnologies]);
+
+  const handleAddTechnology = async (techData) => {
+    try {
+      // Добавляем через API хук
+      const newTech = await addTechnology(techData);
+      
+      // Также добавляем в локальное состояние для немедленного отображения
+      setLocalTechnologies(prev => [
+        ...prev,
+        { 
+          ...newTech, 
+          status: 'not-started',
+          id: newTech.id || Date.now()
+        }
+      ]);
+      
+      return newTech;
+    } catch (err) {
+      console.error('Ошибка добавления технологии:', err);
+      throw err;
+    }
+  };
+
+  const handleStatusChange = (id, newStatus) => {
+    setLocalTechnologies(prev =>
+      prev.map(tech => (tech.id === id ? { ...tech, status: newStatus } : tech))
+    );
+  };
+
+  const randomizeAllStatuses = () => {
+    setLocalTechnologies(prev =>
+      prev.map(tech => {
+        const randomStatus = POSSIBLE_STATUSES[Math.floor(Math.random() * POSSIBLE_STATUSES.length)];
+        return { ...tech, status: randomStatus };
+      })
+    );
+  };
+
+  const progressData = useMemo(() => {
+    const techProgress = allTechnologies.map(tech => ({
+      id: tech.id,
+      title: tech.title,
+      progress: statusToProgress(tech.status)
+    }));
+
+    const overall = techProgress.length > 0 
+      ? Math.round(techProgress.reduce((sum, t) => sum + t.progress, 0) / techProgress.length)
+      : 0;
+
+    const frontendProgress = techProgress.find(t => t.title.toLowerCase().includes('react'))?.progress || 0;
+    const backendProgress = techProgress.find(t => t.title.toLowerCase().includes('node'))?.progress || 0;
+    const databaseProgress = techProgress.find(t => t.title.toLowerCase().includes('typescript'))?.progress || 0;
+
+    return {
+      overall,
+      frontendProgress,
+      backendProgress,
+      databaseProgress
+    };
+  }, [allTechnologies]);
 
   if (loading) {
     return (
-      <div className="app-loading">
-        <div className="spinner"></div>
-        <p>Загрузка технологий...</p>
-      </div>
+      <Router>
+        <div className="app-loading">
+          <div className="spinner"></div>
+          <p>Загрузка технологий...</p>
+        </div>
+      </Router>
     );
   }
 
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>🚀 Трекер изучения технологий</h1>
-        <button onClick={refetch} className="refresh-btn">
-          Обновить
-        </button>
-      </header>
+    <Router>
+      <div className="app">
+        {/* Навигационное меню */}
+        <nav className="main-nav">
+          <div className="nav-brand">
+            <h2>Мое Приложение</h2>
+          </div>
+          <ul className="nav-links">
+            <li>
+              <Link to="/">Главная</Link>
+            </li>
+            <li>
+              <Link to="/about">О нас</Link>
+            </li>
+            <li>
+              <Link to="/contact">Контакты</Link>
+            </li>
+          </ul>
+        </nav>
+        
+        <Greeting />
+        <UserCard
+          name="Артём и Саня"
+          role="Администратор"
+          avatarUrl="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfVMhpKmVy_-iwfRLAiNiaDslMa-2oEz7KTw&s"
+          isOnline={true}
+        />
 
-      {error && (
-        <div className="app-error">
-          <p>{error}</p>
-          <button onClick={refetch}>Попробовать снова</button>
-        </div>
-      )}
+        {/* Основное содержимое */}
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={
+              <>
+                {/* Оригинальная версия с заголовком и кнопкой обновления */}
+                <header className="app-header">
+                  <h1>🚀 Трекер изучения технологий</h1>
+                  <button onClick={refetch} className="refresh-btn">
+                    Обновить
+                  </button>
+                </header>
 
-      <main className="app-main">
-        <RoadmapImporter />
-        <TechnologyList technologies={technologies} />
-      </main>
-    </div>
+                {error && (
+                  <div className="app-error">
+                    <p>{error}</p>
+                    <button onClick={refetch}>Попробовать снова</button>
+                  </div>
+                )}
+
+                <main className="app-main">
+                  {/* Импорт технологий */}
+                  <div className="roadmap-importer-section">
+                    <h3>Импорт дорожной карты</h3>
+                    <RoadmapImporter 
+                      addTechnology={handleAddTechnology}
+                      refetch={refetch}
+                    />
+                  </div>
+
+                  {/* Все технологии (локальные + API) */}
+                  <div className="technology-list">
+                    <h3>Все технологии ({allTechnologies.length}):</h3>
+                    
+                    {allTechnologies.map(tech => (
+                      <TechnologyCard
+                        key={tech.id}
+                        title={tech.title}
+                        description={tech.description}
+                        status={tech.status}
+                        onStatusChange={(newStatus) => handleStatusChange(tech.id, newStatus)}
+                        category={tech.category}
+                        difficulty={tech.difficulty}
+                      />
+                    ))}
+                    
+                    {/* Кнопка случайного прогресса */}
+                    <button
+                      onClick={randomizeAllStatuses}
+                      style={{
+                        margin: '20px 0',
+                        padding: '10px 20px',
+                        fontSize: '16px',
+                        backgroundColor: '#000000ff',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Случайный прогресс
+                    </button>
+
+                    <ProgressDashboard
+                      overallProgress={progressData.overall}
+                      frontendProgress={progressData.frontendProgress}
+                      backendProgress={progressData.backendProgress}
+                      databaseProgress={progressData.databaseProgress}
+                    />
+
+                    <Counter />
+                    <RegistrationForm />
+                    <ColorPicker />
+                    <WindowSizeTracker />
+                    <UserProfile />
+                    <ContactForm />
+                    <UserSettings />
+                    <SimpleModalExample />
+                  </div>
+                </main>
+              </>
+            } />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
-
-//   return (
-//     <Router>
-//       <div className="app">
-//         {/* Навигационное меню */}
-//         <nav className="main-nav">
-//           <div className="nav-brand">
-//             <h2>Мое Приложение</h2>
-//           </div>
-//           <ul className="nav-links">
-//             <li>
-//               <Link to="/">Главная</Link>
-//             </li>
-//             <li>
-//               <Link to="/about">О нас</Link>
-//             </li>
-//             <li>
-//               <Link to="/contact">Контакты</Link>
-//             </li>
-//           </ul>
-//         </nav>
-
-//         {/* Основное содержимое */}
-//         <main className="main-content">
-//           <Routes>
-//             <Route path="/" element={<Home />} />
-//             <Route path="/about" element={<About />} />
-//             <Route path="/contact" element={<Contact />} />
-//           </Routes>
-//         </main>
-//       </div>
-//     </Router>
-// );
-
-//   const [technologies, setTechnologies] = useState([
-//     { id: 1, title: 'React Components ', description: 'Изучение базовых компонентов', status: 'completed' },
-//     { id: 2, title: 'JSX Syntax ', description: 'Освоение синтаксиса JSX', status: 'in-progress' },
-//     { id: 3, title: 'State Management ', description: 'Работа с состоянием компонентов', status: 'not-started' }
-//   ]);
-
-//   const handleStatusChange = (id, newStatus) => {
-//     setTechnologies(prev =>
-//       prev.map(tech => (tech.id === id ? { ...tech, status: newStatus } : tech))
-//     );
-//   };
-
-//   const randomizeAllStatuses = () => {
-//     setTechnologies(prev =>
-//       prev.map(tech => {
-//         const randomStatus = POSSIBLE_STATUSES[Math.floor(Math.random() * POSSIBLE_STATUSES.length)];
-//         return { ...tech, status: randomStatus };
-//       })
-//     );
-//   };
-
-//   const progressData = useMemo(() => {
-//     const techProgress = technologies.map(tech => ({
-//       id: tech.id,
-//       title: tech.title,
-//       progress: statusToProgress(tech.status)
-//     }));
-
-//     const overall = Math.round(
-//       techProgress.reduce((sum, t) => sum + t.progress, 0) / techProgress.length
-//     );
-
-//     const frontendProgress = techProgress.find(t => t.id === 1)?.progress || 0;
-//     const backendProgress = techProgress.find(t => t.id === 2)?.progress || 0;
-//     const databaseProgress = techProgress.find(t => t.id === 3)?.progress || 0;
-
-//     return {
-//       overall,
-//       frontendProgress,
-//       backendProgress,
-//       databaseProgress
-//     };
-//   }, [technologies]);
-
-//   return (
-//     <div className="App">
-//       <Greeting />
-      
-//       <UserCard
-//         name="Артём и Саня"
-//         role="Администратор"
-//         avatarUrl="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfVMhpKmVy_-iwfRLAiNiaDslMa-2oEz7KTw&s"
-//         isOnline={true}
-//       />
-
-//       <div className="technology-list">
-//         {technologies.map(tech => (
-//           <TechnologyCard
-//             key={tech.id}
-//             title={tech.title}
-//             description={tech.description}
-//             status={tech.status}
-//             onStatusChange={(newStatus) => handleStatusChange(tech.id, newStatus)}
-//           />
-//         ))}
-
-//         {}
-//         <button
-//           onClick={randomizeAllStatuses}
-//           style={{
-//             margin: '20px 0',
-//             padding: '10px 20px',
-//             fontSize: '16px',
-//             backgroundColor: '#000000ff',
-//             color: 'white',
-//             border: 'none',
-//             borderRadius: '8px',
-//             cursor: 'pointer'
-//           }}
-//         >
-//            Случайный прогресс
-//         </button>
-
-//         <ProgressDashboard
-//           overallProgress={progressData.overall}
-//           frontendProgress={progressData.frontendProgress}
-//           backendProgress={progressData.backendProgress}
-//           databaseProgress={progressData.databaseProgress}
-//         />
-
-//         <Counter />
-//         <RegistrationForm />
-//         <ColorPicker />
-//         <WindowSizeTracker />
-//         <UserProfile />
-//         <ContactForm />
-//         <UserSettings />
-//         <SimpleModalExample />
-//       </div>
-//     </div>
-//   );
 }
 
 export default App;
