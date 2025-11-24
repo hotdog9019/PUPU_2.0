@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useState, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import {
@@ -13,9 +12,8 @@ import {
   Container,
   Button
 } from '@mui/material';
+import { createTheme } from '@mui/material/styles'; 
 import { List as ListIcon, Dashboard as DashboardIcon, Refresh as RefreshIcon } from '@mui/icons-material';
-import { theme } from './styles/theme'; 
-
 
 import Home from './pages/Home';
 import About from './pages/About';
@@ -31,15 +29,11 @@ import ContactForm from './component/ContactForm';
 import UserSettings from './component/UserSettings';
 import SimpleModalExample from './component/SimpleModalExample';
 
-
-
 import SimpleTechCard from './component/SimpleTechCard';
 import Dashboard from './component/Dashboard';
 import DataImportExport from './component/DataImportExport';
 import useTechnologiesApi from './component/hooks/useTechnologiesApi';
 
-
-console.log('SimpleTechCard:', SimpleTechCard);
 const POSSIBLE_STATUSES = ['not-started', 'in-progress', 'completed'];
 
 function TabPanel({ children, value, index, ...other }) {
@@ -57,6 +51,25 @@ function TabPanel({ children, value, index, ...other }) {
 }
 
 function App() {
+  
+  const [colorMode, setColorMode] = useState('light');
+
+  const toggleColorMode = () => {
+    setColorMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+  };
+
+
+  const appTheme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: colorMode,
+        
+        },
+      }),
+    [colorMode]
+  );
+
   const { technologies: apiTechnologies, loading, error, refetch } = useTechnologiesApi();
 
   const [localTechnologies, setLocalTechnologies] = useState([
@@ -72,6 +85,7 @@ function App() {
     }));
     return [...localTechnologies, ...apiTechWithStatus];
   }, [localTechnologies, apiTechnologies]);
+
   const addLocalTechnology = (techData) => {
     const newTech = {
       id: Date.now(),
@@ -81,6 +95,7 @@ function App() {
     };
     setLocalTechnologies(prev => [...prev, newTech]);
   };
+
   const handleStatusChange = (id, newStatus) => {
     setLocalTechnologies(prev =>
       prev.map(tech => (tech.id === id ? { ...tech, status: newStatus } : tech))
@@ -100,19 +115,19 @@ function App() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={appTheme}>
       <CssBaseline />
       <Router>
         <div className="app">
           {/* Навигация сайта */}
-          <nav className="main-nav" style={{ padding: '10px', background: '#f5f5f5' }}>
+          <nav className="main-nav" style={{ padding: '10px', background: appTheme.palette.background.default }}>
             <div className="nav-brand">
               <h2>Мое Приложение</h2>
             </div>
             <ul className="nav-links" style={{ listStyle: 'none', display: 'flex', gap: '16px' }}>
-              <li><Link to="/">Главная</Link></li>
-              <li><Link to="/about">О нас</Link></li>
-              <li><Link to="/contact">Контакты</Link></li>
+              <li><Link to="/" style={{ color: appTheme.palette.text.primary }}>Главная</Link></li>
+              <li><Link to="/about" style={{ color: appTheme.palette.text.primary }}>О нас</Link></li>
+              <li><Link to="/contact" style={{ color: appTheme.palette.text.primary }}>Контакты</Link></li>
             </ul>
           </nav>
 
@@ -129,17 +144,29 @@ function App() {
               <Route path="/" element={
                 <Container maxWidth="xl" sx={{ mt: 2 }}>
                   <header className="app-header">
-                    <Typography variant="h4" gutterBottom>
-                      🚀 Трекер изучения технологий
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      startIcon={<RefreshIcon />}
-                      onClick={refetch}
-                      size="small"
-                    >
-                      Обновить API
-                    </Button>
+                    <AppBar position="static" color="transparent" elevation={0}>
+                      <Toolbar>
+                        <Typography variant="h4" sx={{ flexGrow: 1 }}>
+                          🚀 Трекер изучения технологий
+                        </Typography>
+                        <Button
+                          variant="outlined"
+                          startIcon={<RefreshIcon />}
+                          onClick={refetch}
+                          size="small"
+                          sx={{ mr: 1 }}
+                        >
+                          Обновить API
+                        </Button>
+                        <Button
+                          variant="contained"
+                          onClick={toggleColorMode}
+                          size="small"
+                        >
+                          {colorMode === 'light' ? '🌙 Ночная' : '☀️ Дневная'}
+                        </Button>
+                      </Toolbar>
+                    </AppBar>
                   </header>
 
                   {error && (
@@ -150,7 +177,7 @@ function App() {
                   )}
 
                   {/* Табы: Список / Дашборд */}
-                  <AppBar position="static" color="transparent" elevation={0} sx={{ mb: 3 }}>
+                  <AppBar position="static" color="transparent" elevation={0} sx={{ mt: 2, mb: 3 }}>
                     <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} aria-label="вкладки">
                       <Tab icon={<ListIcon />} label="Технологии" />
                       <Tab icon={<DashboardIcon />} label="Дашборд" />
@@ -159,7 +186,6 @@ function App() {
 
                   {/* Вкладка: Список технологий */}
                   <TabPanel value={tabValue} index={0}>
-                    {/* Кнопка добавления */}
                     <Box sx={{ textAlign: 'right', mb: 2 }}>
                       <Button
                         variant="contained"
@@ -174,7 +200,6 @@ function App() {
                       </Button>
                     </Box>
 
-                    {/* Карточки */}
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 4 }}>
                       {allTechnologies.map(tech => (
                         <SimpleTechCard
@@ -185,8 +210,7 @@ function App() {
                       ))}
                     </Box>
 
-                    {/* Импорт/экспорт */}
-                    <Box sx={{ mt: 4, p: 2, border: '1px solid #eee', borderRadius: 2 }}>
+                    <Box sx={{ mt: 4, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                       <Typography variant="h6" gutterBottom>Импорт и экспорт</Typography>
                       <DataImportExport
                         technologies={localTechnologies}
@@ -194,7 +218,6 @@ function App() {
                       />
                     </Box>
 
-                    {/* Доп. компоненты */}
                     <Box sx={{ mt: 4 }}>
                       <Counter />
                       <RegistrationForm />
@@ -207,7 +230,6 @@ function App() {
                     </Box>
                   </TabPanel>
 
-                  {/* Вкладка: Дашборд */}
                   <TabPanel value={tabValue} index={1}>
                     <Dashboard technologies={allTechnologies} />
                   </TabPanel>

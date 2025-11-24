@@ -186,3 +186,34 @@
   margin-top: 4px;
   display: block;
 }
+/* src/App.css */
+
+.app {
+
+text-align: center;
+
+transition: background-color 0.5s, color 0.5s;
+
+}
+
+.app.light {
+
+background-color: #ffffff;
+
+color: #000000;
+
+}
+
+.app.dark {
+
+background-color: #000000;
+
+color: #ffffff;
+
+}
+
+.app-header {
+
+padding: 20px;
+
+}
