@@ -1,246 +1,225 @@
-// App.js
+// src/App.js
 import React, { useState, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import './App.css';
+import {
+  ThemeProvider,
+  CssBaseline,
+  AppBar,
+  Toolbar,
+  Typography,
+  Tabs,
+  Tab,
+  Box,
+  Container,
+  Button
+} from '@mui/material';
+import { List as ListIcon, Dashboard as DashboardIcon, Refresh as RefreshIcon } from '@mui/icons-material';
+import { theme } from './styles/theme'; 
+
+
 import Home from './pages/Home';
 import About from './pages/About';
 import Contact from './pages/Contact';
-import Greeting from '../src/component/Greeting';
-import UserCard from '../src/component/UseCard';
-import TaskList from '../src/component/TaskList';
-import TechnologyCard from '../src/component/TechologyCard.jsx';
-import ProgressHeader from '../src/component/ProgressHeader.jsx';
-import UserSettings from '../src/component/UserSettings.jsx';
-import SimpleModalExample from '../src/component/SimpleModalExample.jsx';
-import ProgressDashboard from '../src/component/ProgressDashboard.jsx';
-import WindowSizeTracker from '../src/component/WindowSizeTracker';
-import UserProfile from '../src/component/UserProfile';
-import ContactForm from '../src/component/ContactForm';
-import Counter from '../src/component/Counter';
-import RegistrationForm from '../src/component/RegistrationForm';
-import ColorPicker from '../src/component/ColorPicker';
-import useTechnologiesApi from '../src/component/hooks/useTechnologiesApi';
-import RoadmapImporter from '../src/component/RoadmapImporter';
-import TechnologyList from '../src/pages/TechnologyList.js';
+import Greeting from './component/Greeting';
+import UserCard from './component/UseCard';
+import Counter from './component/Counter';
+import RegistrationForm from './component/RegistrationForm';
+import ColorPicker from './component/ColorPicker';
+import WindowSizeTracker from './component/WindowSizeTracker';
+import UserProfile from './component/UserProfile';
+import ContactForm from './component/ContactForm';
+import UserSettings from './component/UserSettings';
+import SimpleModalExample from './component/SimpleModalExample';
+
+
+
+import SimpleTechCard from './component/SimpleTechCard';
+import Dashboard from './component/Dashboard';
+import DataImportExport from './component/DataImportExport';
+import useTechnologiesApi from './component/hooks/useTechnologiesApi';
+
+
+console.log('SimpleTechCard:', SimpleTechCard);
 const POSSIBLE_STATUSES = ['not-started', 'in-progress', 'completed'];
 
-const statusToProgress = (status) => {
-  switch (status) {
-    case 'completed': return 100;
-    case 'in-progress': return 50;
-    case 'not-started': return 0;
-    default: return 0;
-  }
-};
+function TabPanel({ children, value, index, ...other }) {
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`tabpanel-${index}`}
+      aria-labelledby={`tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 0 }}>{children}</Box>}
+    </div>
+  );
+}
 
 function App() {
-  const { technologies: apiTechnologies, loading, error, refetch, addTechnology } = useTechnologiesApi();
+  const { technologies: apiTechnologies, loading, error, refetch } = useTechnologiesApi();
 
   const [localTechnologies, setLocalTechnologies] = useState([
-    { id: 1, title: 'React Components ', description: 'Изучение базовых компонентов', status: 'completed' },
-    { id: 2, title: 'JSX Syntax ', description: 'Освоение синтаксиса JSX', status: 'in-progress' },
-    { id: 3, title: 'State Management ', description: 'Работа с состоянием компонентов', status: 'not-started' }
+    { id: 1, title: 'React Components', description: 'Изучение базовых компонентов', status: 'completed' },
+    { id: 2, title: 'JSX Syntax', description: 'Освоение синтаксиса JSX', status: 'in-progress' },
+    { id: 3, title: 'State Management', description: 'Работа с состоянием компонентов', status: 'not-started' }
   ]);
 
-  // Объединяем локальные технологии и технологии из API
   const allTechnologies = useMemo(() => {
-    // Преобразуем API технологии в формат для отображения
     const apiTechWithStatus = apiTechnologies.map(tech => ({
       ...tech,
-      status: 'not-started' // По умолчанию для импортированных технологий
+      status: 'not-started'
     }));
-    
     return [...localTechnologies, ...apiTechWithStatus];
   }, [localTechnologies, apiTechnologies]);
-
-  const handleAddTechnology = async (techData) => {
-    try {
-      // Добавляем через API хук
-      const newTech = await addTechnology(techData);
-      
-      // Также добавляем в локальное состояние для немедленного отображения
-      setLocalTechnologies(prev => [
-        ...prev,
-        { 
-          ...newTech, 
-          status: 'not-started',
-          id: newTech.id || Date.now()
-        }
-      ]);
-      
-      return newTech;
-    } catch (err) {
-      console.error('Ошибка добавления технологии:', err);
-      throw err;
-    }
+  const addLocalTechnology = (techData) => {
+    const newTech = {
+      id: Date.now(),
+      ...techData,
+      status: 'not-started',
+      createdAt: new Date().toISOString()
+    };
+    setLocalTechnologies(prev => [...prev, newTech]);
   };
-
   const handleStatusChange = (id, newStatus) => {
     setLocalTechnologies(prev =>
       prev.map(tech => (tech.id === id ? { ...tech, status: newStatus } : tech))
     );
   };
 
-  const randomizeAllStatuses = () => {
-    setLocalTechnologies(prev =>
-      prev.map(tech => {
-        const randomStatus = POSSIBLE_STATUSES[Math.floor(Math.random() * POSSIBLE_STATUSES.length)];
-        return { ...tech, status: randomStatus };
-      })
-    );
-  };
-
-  const progressData = useMemo(() => {
-    const techProgress = allTechnologies.map(tech => ({
-      id: tech.id,
-      title: tech.title,
-      progress: statusToProgress(tech.status)
-    }));
-
-    const overall = techProgress.length > 0 
-      ? Math.round(techProgress.reduce((sum, t) => sum + t.progress, 0) / techProgress.length)
-      : 0;
-
-    const frontendProgress = techProgress.find(t => t.title.toLowerCase().includes('react'))?.progress || 0;
-    const backendProgress = techProgress.find(t => t.title.toLowerCase().includes('node'))?.progress || 0;
-    const databaseProgress = techProgress.find(t => t.title.toLowerCase().includes('typescript'))?.progress || 0;
-
-    return {
-      overall,
-      frontendProgress,
-      backendProgress,
-      databaseProgress
-    };
-  }, [allTechnologies]);
+  const [tabValue, setTabValue] = useState(0);
 
   if (loading) {
     return (
       <Router>
-        <div className="app-loading">
-          <div className="spinner"></div>
-          <p>Загрузка технологий...</p>
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <Typography variant="h6">Загрузка...</Typography>
         </div>
       </Router>
     );
   }
 
   return (
-    <Router>
-      <div className="app">
-        {/* Навигационное меню */}
-        <nav className="main-nav">
-          <div className="nav-brand">
-            <h2>Мое Приложение</h2>
-          </div>
-          <ul className="nav-links">
-            <li>
-              <Link to="/">Главная</Link>
-            </li>
-            <li>
-              <Link to="/about">О нас</Link>
-            </li>
-            <li>
-              <Link to="/contact">Контакты</Link>
-            </li>
-          </ul>
-        </nav>
-        
-        <Greeting />
-        <UserCard
-          name="Артём и Саня"
-          role="Администратор"
-          avatarUrl="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfVMhpKmVy_-iwfRLAiNiaDslMa-2oEz7KTw&s"
-          isOnline={true}
-        />
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <div className="app">
+          {/* Навигация сайта */}
+          <nav className="main-nav" style={{ padding: '10px', background: '#f5f5f5' }}>
+            <div className="nav-brand">
+              <h2>Мое Приложение</h2>
+            </div>
+            <ul className="nav-links" style={{ listStyle: 'none', display: 'flex', gap: '16px' }}>
+              <li><Link to="/">Главная</Link></li>
+              <li><Link to="/about">О нас</Link></li>
+              <li><Link to="/contact">Контакты</Link></li>
+            </ul>
+          </nav>
 
-        {/* Основное содержимое */}
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={
-              <>
-                {/* Оригинальная версия с заголовком и кнопкой обновления */}
-                <header className="app-header">
-                  <h1>🚀 Трекер изучения технологий</h1>
-                  <button onClick={refetch} className="refresh-btn">
-                    Обновить
-                  </button>
-                </header>
+          <Greeting />
+          <UserCard
+            name="Артём и Саня"
+            role="Администратор"
+            avatarUrl="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfVMhpKmVy_-iwfRLAiNiaDslMa-2oEz7KTw&s"
+            isOnline={true}
+          />
 
-                {error && (
-                  <div className="app-error">
-                    <p>{error}</p>
-                    <button onClick={refetch}>Попробовать снова</button>
-                  </div>
-                )}
-
-                <main className="app-main">
-                  {/* Импорт технологий */}
-                  <div className="roadmap-importer-section">
-                    <h3>Импорт дорожной карты</h3>
-                    <RoadmapImporter 
-                      addTechnology={handleAddTechnology}
-                      refetch={refetch}
-                    />
-                  </div>
-
-                  {/* Все технологии (локальные + API) */}
-                  <div className="technology-list">
-                    <h3>Все технологии ({allTechnologies.length}):</h3>
-                    
-                    {allTechnologies.map(tech => (
-                      <TechnologyCard
-                        key={tech.id}
-                        title={tech.title}
-                        description={tech.description}
-                        status={tech.status}
-                        onStatusChange={(newStatus) => handleStatusChange(tech.id, newStatus)}
-                        category={tech.category}
-                        difficulty={tech.difficulty}
-                      />
-                    ))}
-                    
-                    {/* Кнопка случайного прогресса */}
-                    <button
-                      onClick={randomizeAllStatuses}
-                      style={{
-                        margin: '20px 0',
-                        padding: '10px 20px',
-                        fontSize: '16px',
-                        backgroundColor: '#000000ff',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: 'pointer'
-                      }}
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={
+                <Container maxWidth="xl" sx={{ mt: 2 }}>
+                  <header className="app-header">
+                    <Typography variant="h4" gutterBottom>
+                      🚀 Трекер изучения технологий
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      startIcon={<RefreshIcon />}
+                      onClick={refetch}
+                      size="small"
                     >
-                      Случайный прогресс
-                    </button>
+                      Обновить API
+                    </Button>
+                  </header>
 
-                    <ProgressDashboard
-                      overallProgress={progressData.overall}
-                      frontendProgress={progressData.frontendProgress}
-                      backendProgress={progressData.backendProgress}
-                      databaseProgress={progressData.databaseProgress}
-                    />
+                  {error && (
+                    <Box sx={{ mb: 2, p: 1, bgcolor: 'error.light', borderRadius: 1 }}>
+                      <Typography color="error">{error}</Typography>
+                      <Button onClick={refetch} size="small">Повторить</Button>
+                    </Box>
+                  )}
 
-                    <Counter />
-                    <RegistrationForm />
-                    <ColorPicker />
-                    <WindowSizeTracker />
-                    <UserProfile />
-                    <ContactForm />
-                    <UserSettings />
-                    <SimpleModalExample />
-                  </div>
-                </main>
-              </>
-            } />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+                  {/* Табы: Список / Дашборд */}
+                  <AppBar position="static" color="transparent" elevation={0} sx={{ mb: 3 }}>
+                    <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} aria-label="вкладки">
+                      <Tab icon={<ListIcon />} label="Технологии" />
+                      <Tab icon={<DashboardIcon />} label="Дашборд" />
+                    </Tabs>
+                  </AppBar>
+
+                  {/* Вкладка: Список технологий */}
+                  <TabPanel value={tabValue} index={0}>
+                    {/* Кнопка добавления */}
+                    <Box sx={{ textAlign: 'right', mb: 2 }}>
+                      <Button
+                        variant="contained"
+                        onClick={() => addLocalTechnology({
+                          title: `Новая технология ${allTechnologies.length + 1}`,
+                          description: 'Описание новой технологии',
+                          category: 'other',
+                          difficulty: 'beginner'
+                        })}
+                      >
+                        + Добавить
+                      </Button>
+                    </Box>
+
+                    {/* Карточки */}
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 4 }}>
+                      {allTechnologies.map(tech => (
+                        <SimpleTechCard
+                          key={tech.id}
+                          technology={tech}
+                          onStatusChange={handleStatusChange}
+                        />
+                      ))}
+                    </Box>
+
+                    {/* Импорт/экспорт */}
+                    <Box sx={{ mt: 4, p: 2, border: '1px solid #eee', borderRadius: 2 }}>
+                      <Typography variant="h6" gutterBottom>Импорт и экспорт</Typography>
+                      <DataImportExport
+                        technologies={localTechnologies}
+                        setTechnologies={setLocalTechnologies}
+                      />
+                    </Box>
+
+                    {/* Доп. компоненты */}
+                    <Box sx={{ mt: 4 }}>
+                      <Counter />
+                      <RegistrationForm />
+                      <ColorPicker />
+                      <WindowSizeTracker />
+                      <UserProfile />
+                      <ContactForm />
+                      <UserSettings />
+                      <SimpleModalExample />
+                    </Box>
+                  </TabPanel>
+
+                  {/* Вкладка: Дашборд */}
+                  <TabPanel value={tabValue} index={1}>
+                    <Dashboard technologies={allTechnologies} />
+                  </TabPanel>
+                </Container>
+              } />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+            </Routes>
+          </main>
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 
